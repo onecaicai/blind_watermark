@@ -37,6 +37,15 @@ cd blind_watermark
 pip install .
 ```
 
+## Web UI (added in this fork)
+
+A local browser UI for embedding and extracting text watermarks. See [web/README.md](web/README.md).
+
+```bash
+./web/start.sh
+# open http://127.0.0.1:5005
+```
+
 # How to use
 
 

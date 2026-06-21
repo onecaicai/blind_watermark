@@ -32,6 +32,15 @@ cd blind_watermark
 pip install .
 ```
 
+## Web UI（本 Fork 新增）
+
+本地浏览器图形界面，用于嵌入和提取文字盲水印。详见 [web/README.md](web/README.md)。
+
+```bash
+./web/start.sh
+# 访问 http://127.0.0.1:5005
+```
+
 # 如何使用
 
 ## 命令行中使用

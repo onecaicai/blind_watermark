@@ -1,0 +1,15 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Web UI runtime files
+web/uploads/
+web/output/
+
+# Local test outputs
+examples/output/*
+!examples/output/.keep
