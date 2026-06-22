@@ -1,182 +1,84 @@
-# blind-watermark
+# blind-watermark · Web UI
 
-基于频域的数字盲水印  
+本仓库 Fork 自 [guofei9987/blind_watermark](https://github.com/guofei9987/blind_watermark)，在原有盲水印库基础上**新增了本地 Web 图形界面**，可在浏览器中完成文字水印的嵌入与提取，无需手写命令行。
 
-
-[![PyPI](https://img.shields.io/pypi/v/blind_watermark)](https://pypi.org/project/blind_watermark/)
-[![Build Status](https://travis-ci.com/guofei9987/blind_watermark.svg?branch=master)](https://travis-ci.com/guofei9987/blind_watermark)
-[![codecov](https://codecov.io/gh/guofei9987/blind_watermark/branch/master/graph/badge.svg)](https://codecov.io/gh/guofei9987/blind_watermark)
-[![License](https://img.shields.io/pypi/l/blind_watermark.svg)](https://github.com/guofei9987/blind_watermark/blob/master/LICENSE)
 ![Python](https://img.shields.io/badge/python->=3.5-green.svg)
 ![Platform](https://img.shields.io/badge/platform-windows%20|%20linux%20|%20macos-green.svg)
-[![stars](https://img.shields.io/github/stars/guofei9987/blind_watermark.svg?style=social)](https://github.com/guofei9987/blind_watermark/)
-[![fork](https://img.shields.io/github/forks/guofei9987/blind_watermark?style=social)](https://github.com/guofei9987/blind_watermark/fork)
-[![Downloads](https://pepy.tech/badge/blind-watermark)](https://pepy.tech/project/blind-watermark)
-[![Discussions](https://img.shields.io/badge/discussions-green.svg)](https://github.com/guofei9987/blind_watermark/discussions)
+[![License](https://img.shields.io/pypi/l/blind_watermark.svg)](https://github.com/guofei9987/blind_watermark/blob/master/LICENSE)
 
+## 本 Fork 新增内容
 
-- **Documentation:** [https://BlindWatermark.github.io/blind_watermark/#/en/](https://BlindWatermark.github.io/blind_watermark/#/en/)
-- **文档：** [https://BlindWatermark.github.io/blind_watermark/#/zh/](https://BlindWatermark.github.io/blind_watermark/#/zh/)  
-- **English readme** [README.md](README.md)
-- **Source code:** [https://github.com/guofei9987/blind_watermark](https://github.com/guofei9987/blind_watermark)
+- **Web 图形界面**（`web/`）：上传图片、输入水印文字与密码，一键嵌入或提取
+- **Flask 本地服务**：默认运行在 `http://127.0.0.1:5005`
+- **启动脚本**：`./web/start.sh` 一键启动
 
-# 安装
+## 快速开始
+
+### 1. 安装依赖
+
 ```bash
-pip install blind-watermark
-```
-
-或者安装最新开发版本
-```bach
-git clone git@github.com:guofei9987/blind_watermark.git
+git clone https://github.com/onecaicai/blind_watermark.git
 cd blind_watermark
-pip install .
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+pip install -r requirements.txt
+pip install --no-build-isolation -e .
+pip install -r web/requirements.txt
 ```
 
-## Web UI（本 Fork 新增）
-
-本地浏览器图形界面，用于嵌入和提取文字盲水印。详见 [web/README.md](web/README.md)。
+### 2. 启动 Web 界面
 
 ```bash
 ./web/start.sh
-# 访问 http://127.0.0.1:5005
 ```
 
-# 如何使用
+浏览器打开：**http://127.0.0.1:5005**
 
-## 命令行中使用
+### 3. 使用流程
+
+**嵌入水印**
+
+1. 上传原图
+2. 输入水印文字与数字密码
+3. 下载含水印图片，并**自行记录**返回的 `wm_size`
+
+**提取水印**
+
+1. 上传含水印图片
+2. 填写嵌入时保存的 `wm_size` 与相同密码
+3. 查看提取出的文字
+
+> 水印长度无法从图片自动识别，提取时必须与嵌入时一致。
+
+## 项目结构
+
+```
+web/
+├── app.py              # Flask 后端
+├── start.sh            # 启动脚本
+├── templates/          # 页面模板
+└── static/             # 样式与脚本
+```
+
+更多 Web 界面说明见 [web/README.md](web/README.md)。
+
+## 原项目
+
+核心算法与 CLI / Python API 均来自上游项目：
+
+- **上游仓库**：[guofei9987/blind_watermark](https://github.com/guofei9987/blind_watermark)
+- **官方文档**：[中文](https://BlindWatermark.github.io/blind_watermark/#/zh/) · [English](https://BlindWatermark.github.io/blind_watermark/#/en/)
+- **PyPI 安装**：`pip install blind-watermark`
+
+命令行示例：
 
 ```bash
-# 嵌入水印：
 blind_watermark --embed --pwd 1234 examples/pic/ori_img.jpeg "watermark text" examples/output/embedded.png
-# 提取水印：
 blind_watermark --extract --pwd 1234 --wm_shape 111 examples/output/embedded.png
 ```
 
+## License
 
-
-## Python 中使用
-
-原图 + 水印 = 打上水印的图
-
-![origin_image](docs/原图.jpeg) + '@guofei9987 开源万岁！' = ![打上水印的图](docs/打上水印的图.jpg)
-
-
-
-参考 [代码](/examples/example_str.py)
-
-
-嵌入水印
-```python
-from blind_watermark import WaterMark
-
-bwm1 = WaterMark(password_img=1, password_wm=1)
-bwm1.read_img('pic/ori_img.jpg')
-wm = '@guofei9987 开源万岁！'
-bwm1.read_wm(wm, mode='str')
-bwm1.embed('output/embedded.png')
-len_wm = len(bwm1.wm_bit)
-print('Put down the length of wm_bit {len_wm}'.format(len_wm=len_wm))
-```
-
-
-提取水印
-```python
-bwm1 = WaterMark(password_img=1, password_wm=1)
-wm_extract = bwm1.extract('output/embedded.png', wm_shape=len_wm, mode='str')
-print(wm_extract)
-```
-Output:
->@guofei9987 开源万岁！
-
-
-### 各种攻击后的效果
-
-|攻击方式|攻击后的图片|提取的水印|
-|--|--|--|
-|旋转攻击45度|![旋转攻击](docs/旋转攻击.jpg)|'@guofei9987 开源万岁！'|
-|随机截图|![截屏攻击](docs/截屏攻击2_还原.jpg)|'@guofei9987 开源万岁！'|
-|多遮挡| ![多遮挡攻击](docs/多遮挡攻击.jpg) |'@guofei9987 开源万岁！'|
-|纵向裁剪|![横向裁剪攻击](docs/横向裁剪攻击_填补.jpg)|'@guofei9987 开源万岁！'|
-|横向裁剪|![纵向裁剪攻击](docs/纵向裁剪攻击_填补.jpg)|'@guofei9987 开源万岁！'|
-|缩放攻击|![缩放攻击](docs/缩放攻击.jpg)|'@guofei9987 开源万岁！'|
-|椒盐攻击|![椒盐攻击](docs/椒盐攻击.jpg)|'@guofei9987 开源万岁！'|
-|亮度攻击|![亮度攻击](docs/亮度攻击.jpg)|'@guofei9987 开源万岁！'|
-
-
-
-### 嵌入图片
-
-参考 [代码](/examples/example_str.py)
-
-
-嵌入：
-```python
-from blind_watermark import WaterMark
-
-bwm1 = WaterMark(password_wm=1, password_img=1)
-# read original image
-bwm1.read_img('pic/ori_img.jpg')
-# read watermark
-bwm1.read_wm('pic/watermark.png')
-# embed
-bwm1.embed('output/embedded.png')
-```
-
-提取：
-```python
-bwm1 = WaterMark(password_wm=1, password_img=1)
-# notice that wm_shape is necessary
-bwm1.extract(filename='output/embedded.png', wm_shape=(128, 128), out_wm_name='output/extracted.png', )
-```
-
-|攻击方式|攻击后的图片|提取的水印|
-|--|--|--|
-|旋转攻击45度|![旋转攻击](docs/旋转攻击.jpg)|![](docs/旋转攻击_提取水印.png)|
-|随机截图|![截屏攻击](docs/截屏攻击2_还原.jpg)|![](docs/旋转攻击_提取水印.png)|
-|多遮挡| ![多遮挡攻击](docs/多遮挡攻击.jpg) |![多遮挡_提取水印](docs/多遮挡攻击_提取水印.png)|
-
-
-
-### 隐水印还可以是二进制数据
-
-参考 [代码](/examples/example_bit.py)
-
-
-作为 demo， 如果要嵌入是如下长度为6的二进制数据
-```python
-wm = [True, False, True, True, True, False]
-```
-
-嵌入水印
-
-```python
-# 除了嵌入图片，也可以嵌入比特类数据
-from blind_watermark import WaterMark
-
-bwm1 = WaterMark(password_img=1, password_wm=1)
-bwm1.read_ori_img('pic/ori_img.jpg')
-bwm1.read_wm([True, False, True, True, True, False], mode='bit')
-bwm1.embed('output/打上水印的图.png')
-```
-
-解水印：（注意设定水印形状 `wm_shape`）
-```python
-bwm1 = WaterMark(password_img=1, password_wm=1, wm_shape=6)
-wm_extract = bwm1.extract('output/打上水印的图.png', mode='bit')
-print(wm_extract)
-```
-
-解出的水印是一个0～1之间的实数，方便用户自行卡阈值。如果水印信息量远小于图片可容纳量，偏差极小。
-
-# 并行计算
-
-```python
-WaterMark(..., processes=None)
-```
-- `processes`: 整数，指定线程数。默认为 `None`, 表示使用全部线程。
-
-
-## 相关项目
-
-- text_blind_watermark (文本盲水印，把信息隐秘地打入文本): [https://github.com/guofei9987/text_blind_watermark](https://github.com/guofei9987/text_blind_watermark)  
-- HideInfo（藏物于图、藏物于音、藏图于文）：[https://github.com/guofei9987/HideInfo](https://github.com/guofei9987/HideInfo)
+MIT · 遵循原项目 [LICENSE](LICENSE)
